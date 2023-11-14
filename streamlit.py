@@ -6,7 +6,6 @@ import tensorflow as tf
 
 # Load models
 dn_model = tf.keras.models.load_model('model_tf.h5')
-cnn_model = tf.keras.models.load_model('model_cnn.h5')
 
 @st.cache
 def predict_image(model, image):
@@ -23,12 +22,10 @@ if uploaded_file is not None:
     st.write("Classifying...")
 
     # Select the Model
-    model_option = st.selectbox('Choose a model:', ('CNN Model', 'DenseNet Model'))
+    model_option = st.selectbox('Choose a model:', 'DenseNet Model')
 
     # Use the selected model
-    if model_option == 'CNN Model':
-        selected_model = cnn_model
-    else:
+    if model_option == 'DenseNet Model':
         selected_model = dn_model
 
     image = Image.open(uploaded_file)
