@@ -5,8 +5,8 @@ from PIL import Image
 import tensorflow as tf
 
 # Load models
-dn_model = tf.keras.models.load_model('C:/Users/lvminglin/Desktop/cv/assignment 3/model_tf.h5')
-cnn_model = tf.keras.models.load_model('C:/Users/lvminglin/Desktop/cv/assignment 3/model_cnn.h5')
+dn_model = tf.keras.models.load_model('model_tf.h5')
+cnn_model = tf.keras.models.load_model('model_cnn.h5')
 
 @st.cache
 def predict_image(model, image):
