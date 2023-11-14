@@ -9,8 +9,22 @@ dn_model = tf.keras.models.load_model('model_tf.h5')
 
 @st.cache
 def predict_image(model, image):
-    image = np.array(image.resize((64, 64))).astype('float32') / 255.0  # Resize and normalize
+    # Resize the image
+    image = image.resize((64, 64))
+
+    # Convert to grayscale if model expects 1 channel input
+    if model.input_shape[-1] == 1:
+        image = image.convert("L")
+
+    # Convert image to numpy array and normalize
+    image = np.array(image).astype('float32') / 255.0
+
+    # Expand dimensions to match input shape
+    if len(image.shape) == 2:  # For grayscale images
+        image = np.expand_dims(image, axis=-1)
     image = np.expand_dims(image, axis=0)
+
+    # Predict
     predictions = model.predict(image)
     return predictions
 
