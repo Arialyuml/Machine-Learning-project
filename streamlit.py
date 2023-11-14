@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 
-# Load models
+# Load the DenseNet model (model_tf.h5)
 dn_model = tf.keras.models.load_model('model_tf.h5')
 
 @st.cache
@@ -16,22 +16,16 @@ def predict_image(model, image):
 
 st.title('Image Predictor')
 
+uploaded_file = st.file_uploader("Choose an image...")  # File uploader widget
+
 if uploaded_file is not None:
     st.image(uploaded_file, caption='Uploaded Image.', use_column_width=True)
-    st.write("")
     st.write("Classifying...")
 
-    # Select the Model
-    model_option = st.selectbox('Choose a model:', 'DenseNet Model')
-
-    # Use the selected model
-    if model_option == 'DenseNet Model':
-        selected_model = dn_model
-
     image = Image.open(uploaded_file)
-    predictions = predict_image(selected_model, image)
-    
+    predictions = predict_image(dn_model, image)
+
+    # Define class names
     class_names = ['0', '1', '10', '100', '101', '11', '13', '14', '15', '16', '18', '19', '2', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '3', '30', '31', '32', '33', '34', '37', '38', '39', '4', '40', '41', '42', '44', '45', '46', '47', '48', '49', '5', '50', '51', '52', '54', '56', '57', '58', '59', '6', '62', '64', '66', '67', '68', '69', '7', '70', '71', '73', '74', '76', '77', '78', '79', '8', '82', '83', '84', '86', '87', '88', '9', '90', '91', '92', '93', '94', '95', '97', '99']
     st.write(f"Prediction: {class_names[np.argmax(predictions[0])]}")
-
 
