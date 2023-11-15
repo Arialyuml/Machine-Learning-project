@@ -25,3 +25,9 @@ if uploaded_file is not None:
         pred = dn_model.predict(img)  # make prediction using DenseNet model
 
         st.write(f"Prediction: {class_labels[np.argmax(pred[0])]}")  # Display prediction
+
+        if predicted_index < len(class_labels):
+            st.write(f"Prediction: {class_labels[predicted_index]}")
+        else:
+            st.write("Predicted class index is out of range.")
+
