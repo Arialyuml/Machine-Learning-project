@@ -15,7 +15,7 @@ st.title("Image Classifier")
 # Upload the image
 uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 if uploaded_file is not None:
-    img = image.load_img(uploaded_file, target_size=(150, 150))
+    img = image.load_img(uploaded_file, target_size=(150, 150,1), color_mode='grayscale')
     st.image(img, caption='Uploaded Image.', use_column_width=True)
 
     if st.button('Predict'):
