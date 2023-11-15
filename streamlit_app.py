@@ -2,7 +2,6 @@ import streamlit as st
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
-import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -26,19 +25,4 @@ if uploaded_file is not None:
         img = np.expand_dims(img, axis=0)
         pred = dn_model.predict(img)  # make prediction using DenseNet model
 
-        # Get the top 5 probabilities and their corresponding class labels
-        top_5_indices = np.argsort(pred[0])[-5:][::-1]
-        top_5_values = pred[0][top_5_indices]
-        top_5_classes = [class_labels[i] for i in top_5_indices]
-
-        # Create a DataFrame
-        prediction = pd.DataFrame({
-            'name': top_5_classes,
-            'values': top_5_values
-        })
-
-        # Plot the results
-        fig, ax = plt.subplots()
-        ax = sns.barplot(y='name', x='values', data=prediction, order=prediction.sort_values('values', ascending=False).name)
-        ax.set(xlabel='Confidence %', ylabel='Species')
-        st.pyplot(fig)
+        st.write(f"Prediction: {class_labels[np.argmax(predictions[0])]}")
