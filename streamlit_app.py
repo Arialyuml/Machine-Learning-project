@@ -12,22 +12,17 @@ class_labels = ['0', '1', '10', '100', '101', '11', '12', '13', '14', '15', '16'
 
 st.title("Image Classifier")
 
-# Upload the image
+
 uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 if uploaded_file is not None:
-    img = image.load_img(uploaded_file, target_size=(150, 150,1))
+    # Load and convert the image to grayscale
+    img = image.load_img(uploaded_file, target_size=(150, 150))
     st.image(img, caption='Uploaded Image.', use_column_width=True)
 
     if st.button('Predict'):
-        st.markdown('**Predictions**')
         img = image.img_to_array(img)
-        img = np.expand_dims(img, axis=0)
-        pred = dn_model.predict(img)  # make prediction using DenseNet model
+        img = np.expand_dims(img, axis=0)  # Add batch dimension
+        img = np.expand_dims(img, axis=-1)  # Reshape from (150, 150) to (150, 150, 1)
 
-        st.write(f"Prediction: {class_labels[np.argmax(pred[0])]}")  # Display prediction
-
-        if predicted_index < len(class_labels):
-            st.write(f"Prediction: {class_labels[predicted_index]}")
-        else:
-            st.write("Predicted class index is out of range.")
-
+        pred = dn_model.predict(img)  # Make prediction
+        st.write(f"Prediction: {class_labels[np.argmax(pred[0])]}")
