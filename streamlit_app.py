@@ -25,4 +25,8 @@ if uploaded_file is not None:
         img = np.expand_dims(img, axis=-1)  # Reshape from (150, 150) to (150, 150, 1)
 
         pred = dn_model.predict(img)  # Make prediction
-        st.write(f"Prediction: {class_labels[np.argmax(pred[0])]}")
+        predicted_index = np.argmax(pred[0])
+        if predicted_index < len(class_labels):
+            st.write(f"Prediction: {class_labels[predicted_index]}")
+        else:
+            st.write("Predicted class index is out of range.")
