@@ -3,7 +3,6 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Load the DenseNet model when the application starts
 dn_model = load_model('model_tf.h5')
