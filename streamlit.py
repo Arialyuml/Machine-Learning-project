@@ -1,50 +1,44 @@
 import streamlit as st
-import pandas as pd
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 import numpy as np
-from PIL import Image
-import tensorflow as tf
+import seaborn as sns
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# Load the DenseNet model (model_tf.h5)
-dn_model = tf.keras.models.load_model('model_tf.h5')
+# Load the DenseNet model when the application starts
+dn_model = load_model('model_tf.h5')
 
-@st.cache
-def predict_image(model, image):
-    # Resize the image
-    image = image.resize((64, 64))
+# Define class labels
+class_labels =['0', '1', '10', '100', '101', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '3', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '4', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '5', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '6', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '7', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '8', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '9', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99']
+st.title("Image Classifier")
 
-    # Convert to grayscale if model expects 1 channel input
-    if model.input_shape[-1] == 1:
-        image = image.convert("L")
-
-    # Convert image to numpy array and normalize
-    image = np.array(image).astype('float32') / 255.0
-
-    # Expand dimensions to match input shape
-    if len(image.shape) == 2:  # For grayscale images
-        image = np.expand_dims(image, axis=-1)
-    image = np.expand_dims(image, axis=0)
-
-    # Predict
-    predictions = model.predict(image)
-    return predictions
-
-st.title('Image Predictor')
-
-uploaded_file = st.file_uploader("Choose an image...")  # File uploader widget
-
+# Upload the image
+uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 if uploaded_file is not None:
-    st.image(uploaded_file, caption='Uploaded Image.', use_column_width=True)
-    st.write("Classifying...")
+    img = image.load_img(uploaded_file, target_size=(150, 150))
+    st.write('Please upload an image for classification')
+    st.image(img, caption='Uploaded Image.', use_column_width=True)
 
-    image = Image.open(uploaded_file)
-    predictions = predict_image(dn_model, image)
+    if st.button('Predict'):
+        st.markdown('**Predictions**')
+        img = image.img_to_array(img)
+        img = np.expand_dims(img, axis=0)
+        pred = dn_model.predict(img)  # make prediction using DenseNet model
 
-        # Check if predictions are empty or not
-    if predictions.size > 0:
-        class_names = ['0', '1', '10', '100', '101', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '3', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '4', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '5', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '6', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '7', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '8', '80', '81']
-        predicted_class = class_names[np.argmax(predictions[0])]
-        st.write(f"Prediction: {predicted_class}")
-    else:
-        st.write("Unable to make a prediction.")
+        # Get the top 5 probabilities and their corresponding class labels
+        top_5_indices = np.argsort(pred[0])[-5:][::-1]
+        top_5_values = pred[0][top_5_indices]
+        top_5_classes = [class_labels[i] for i in top_5_indices]
 
+        # Create a DataFrame
+        prediction = pd.DataFrame({
+            'name': top_5_classes,
+            'values': top_5_values
+        })
 
+        # Plot the results
+        fig, ax = plt.subplots()
+        ax = sns.barplot(y='name', x='values', data=prediction, order=prediction.sort_values('values', ascending=False).name)
+        ax.set(xlabel='Confidence %', ylabel='Species')
+        st.pyplot(fig)
